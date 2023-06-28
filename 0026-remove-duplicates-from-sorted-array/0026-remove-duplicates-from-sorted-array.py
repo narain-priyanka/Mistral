@@ -1,11 +1,12 @@
 class Solution:
     def removeDuplicates(self, nums: List[int]) -> int:
-        reader=0
-        writer=0
-        while(reader != len(nums)):
-            if(nums[reader]==nums[writer]):
-                reader+=1
-            else:
-                nums[writer+1]=nums[reader]
-                writer+=1
-        return writer+1
+        size = len(nums)
+        insertIndex = 1
+        for i in range(1, size):
+            # Found unique element
+            if nums[i - 1] != nums[i]:      
+                # Updating insertIndex in our main array
+                nums[insertIndex] = nums[i] 
+                # Incrementing insertIndex count by 1 
+                insertIndex = insertIndex + 1       
+        return insertIndex
