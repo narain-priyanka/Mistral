@@ -1,20 +1,22 @@
 class Solution:
     def majorityElement(self, nums: List[int]) -> int:
-        counts = {}
+        hash_counts = {}
         max_count = 0
-        majority_element = None
+        # majority_element = None
 
         for num in nums:
-            if num in counts:
-                counts[num] += 1
+            if num in hash_counts:
+                hash_counts[num] += 1
             else:
-                counts[num] = 1
+                hash_counts[num] = 1
+        for num in hash_counts:
+            if hash_counts[num]>=len(nums)/2:
+                return(num)
 
-            if counts[num] > max_count:
-                max_count = counts[num]
-                majority_element = num
 
-        return majority_element
+
+
+
 
 
 
