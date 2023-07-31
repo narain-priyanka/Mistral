@@ -1,7 +1,5 @@
 class Solution {
     public int countConsistentStrings(String allowed, String[] words) {    
-        // String allowed = "ab";
-        // String[] words = {"ad","bd","aaab","baa","badab"};
         List<Character> list= new ArrayList<>();
         for(char c: allowed.toCharArray()){
             list.add(c);
