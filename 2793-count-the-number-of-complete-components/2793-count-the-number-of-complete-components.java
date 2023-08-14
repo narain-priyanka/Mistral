@@ -1,46 +1,64 @@
 class Solution {
-    Set<Integer> vis = new HashSet<>();
-    int res = 0;
-    Map<Integer, Set<Integer>> nodes;
+    List<Integer> dfs(List<Integer>list,Map<Integer,List<Integer>>map,int key,int[] vis){
+        //visted again means traversal completed for a given connected chunk of nodes
+        if(vis[key]==1)return list;
+        //mark node as visted
+        vis[key]=1;
+        //store list in new list
+        List<Integer>li=new ArrayList<>(list);
+        li.add(key);
+        for(int i=0;i<map.get(key).size();i++){
+            //dfs call for each not visited adjacent node
+            int adjNode=map.get(key).get(i);
+            if(vis[adjNode]==0)li=dfs(li,map,adjNode,vis);
+        }
+        return li;
+    }
+    int conn(List<Integer>list,Map<Integer,List<Integer>>adjList){
+        int cnt=0;
+         for(Integer i:list){
+             //if a node can visit to all other node
+             //means adj list just lack itself
+             //if we add it to its own adjacency list, 
+             //adj will be equal to list.
+             List<Integer>adj=new ArrayList<>(adjList.get(i));
+             adj.add(i);
+             Collections.sort(adj);
+             if(list.equals(adj))cnt++;
+         }
+        return cnt==list.size()?1:0;
+    }
     public int countCompleteComponents(int n, int[][] edges) {
-        //build graph to store all neighbors of each node, by loop the edge.
-        nodes = buidGraph(edges);
-        //Do BFS and check for each islands, res++ if complete.
-        int result = 0;
-        for (int i = 0; i < n; i++) {
-            if (vis.contains(i)) continue;
-            if (bfs(i)) result++;
+        //make adjacency list using map
+        Map<Integer,List<Integer>>map=new HashMap<>();
+        for(int i=0;i<edges.length;i++){
+            //undirected graph so, store both nodes in each other 
+            map.putIfAbsent(edges[i][0],new ArrayList<>());
+            map.get(edges[i][0]).add(edges[i][1]);
+            map.putIfAbsent(edges[i][1],new ArrayList<>());
+            map.get(edges[i][1]).add(edges[i][0]);
         }
-        return result;
-    }
-
-    private Map<Integer, Set<Integer>> buidGraph(int[][] edges) {
-        Map<Integer, Set<Integer>> nodes = new HashMap<>();
-        for (int[] e : edges) {
-            nodes.putIfAbsent(e[0], new HashSet<>());
-            nodes.putIfAbsent(e[1], new HashSet<>());
-            nodes.get(e[0]).add(e[1]);
-            nodes.get(e[1]).add(e[0]);
+        
+        for(int i=0;i<n;i++){
+            //empty adjacency list for single nodes
+            map.putIfAbsent(i,new ArrayList<>());
         }
-        return nodes;
-    }
-
-    private boolean bfs(int i) {
-        Queue<Integer> q = new LinkedList<>();
-        q.offer(i);
-        vis.add(i);
-        int cntOfNeighs = nodes.getOrDefault(i, new HashSet<>()).size(), numOfNodes = 0;
-        boolean result = true;
-        while (!q.isEmpty()) {
-            int curr = q.poll();
-            numOfNodes++;
-            if (nodes.getOrDefault(curr, new HashSet<>()).size() != cntOfNeighs) result = false;
-            for (int neig : nodes.getOrDefault(curr, new HashSet<>())) {
-                if (vis.contains(neig)) continue;
-                vis.add(neig);
-                q.offer(neig);
+        int[] vis=new int[map.size()];
+        int sum=0;
+        for(Map.Entry<Integer,List<Integer>>m:map.entrySet()){
+            if(vis[m.getKey()]==0){
+                List<Integer>list=new ArrayList<>();
+                //get the list of connected nodes
+                list=dfs(list,map,m.getKey(),vis);
+                
+                if(list.size()==1)sum++;
+                else{
+                    //sort it to match with the adjacency list of particular nodes.
+                    Collections.sort(list);
+                    sum+=conn(list,map);
+                }
             }
         }
-        return result && cntOfNeighs == numOfNodes - 1;
+        return sum;
     }
-} 
+}
